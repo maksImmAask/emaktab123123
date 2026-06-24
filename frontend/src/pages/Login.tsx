@@ -18,15 +18,42 @@ function Login() {
         values
       );
 
-      // стандарт SimpleJWT
-      localStorage.setItem("access", response.data.access);
-      localStorage.setItem("refresh", response.data.refresh);
+      console.log("FULL RESPONSE:", response.data);
+      console.log("USER:", response.data.user);
+      console.log("ROLE:", response.data.user?.role);
+
+      localStorage.setItem(
+        "access",
+        response.data.access
+      );
+
+      localStorage.setItem(
+        "refresh",
+        response.data.refresh
+      );
+
+      if (response.data.user) {
+        localStorage.setItem(
+          "role",
+          response.data.user.role
+        );
+
+        localStorage.setItem(
+          "username",
+          response.data.user.username
+        );
+      }
+
+      console.log(
+        "ROLE FROM LOCALSTORAGE:",
+        localStorage.getItem("role")
+      );
 
       message.success("Вход выполнен");
 
       navigate("/dashboard");
     } catch (error) {
-      console.log(error);
+      console.log("LOGIN ERROR:", error);
       message.error("Ошибка входа");
     }
   };
@@ -41,12 +68,19 @@ function Login() {
       }}
     >
       <Card title="Вход" style={{ width: 400 }}>
-        <Form form={form} layout="vertical" onFinish={onFinish}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+        >
           <Form.Item
             label="Username"
             name="username"
             rules={[
-              { required: true, message: "Введите username" },
+              {
+                required: true,
+                message: "Введите username",
+              },
             ]}
           >
             <Input />
@@ -56,13 +90,20 @@ function Login() {
             label="Пароль"
             name="password"
             rules={[
-              { required: true, message: "Введите пароль" },
+              {
+                required: true,
+                message: "Введите пароль",
+              },
             ]}
           >
             <Input.Password />
           </Form.Item>
 
-          <Button type="primary" htmlType="submit" block>
+          <Button
+            type="primary"
+            htmlType="submit"
+            block
+          >
             Войти
           </Button>
         </Form>
