@@ -17,23 +17,21 @@ function Register() {
 
   const onFinish = async (values: RegisterForm) => {
     try {
-        const response = await api.post(
+      await api.post(
         "/api/auth/register/",
         values
-        );
+      );
 
-      localStorage.setItem("access", response.data.access);
-      localStorage.setItem("refresh", response.data.refresh);
+      message.success(
+        "Регистрация успешна. Теперь войдите."
+      );
 
-      message.success("Регистрация успешна");
-
-      navigate("/dashboard");
+      navigate("/login");
     } catch (error) {
-        console.log(error)
-        message.error("Ошибка регистрации")
-        }
+      console.log(error);
+      message.error("Ошибка регистрации");
+    }
   };
-
   return (
     <div
       style={{

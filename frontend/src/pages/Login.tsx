@@ -1,6 +1,7 @@
 import { Button, Card, Form, Input, message } from "antd";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
 interface LoginForm {
   username: string;
@@ -11,49 +12,45 @@ function Login() {
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
+  const login = useAuthStore((state) => state.login);
+
   const onFinish = async (values: LoginForm) => {
     try {
-      const response = await api.post(
+      const { data } = await api.post(
         "/api/auth/login/",
         values
       );
 
-      console.log("FULL RESPONSE:", response.data);
-      console.log("USER:", response.data.user);
-      console.log("ROLE:", response.data.user?.role);
-
-      localStorage.setItem(
-        "access",
-        response.data.access
-      );
-
-      localStorage.setItem(
-        "refresh",
-        response.data.refresh
-      );
-
-      if (response.data.user) {
-        localStorage.setItem(
-          "role",
-          response.data.user.role
-        );
-
-        localStorage.setItem(
-          "username",
-          response.data.user.username
-        );
-      }
-
-      console.log(
-        "ROLE FROM LOCALSTORAGE:",
-        localStorage.getItem("role")
+      login(
+        data.access,
+        data.refresh,
+        data.user
       );
 
       message.success("Вход выполнен");
 
-      navigate("/dashboard");
+      switch (data.user.role) {
+        case "admin":
+          navigate("/dashboard/admin");
+          break;
+
+        case "teacher":
+          navigate("/dashboard/teacher");
+          break;
+
+        case "student":
+          navigate("/dashboard/student");
+          break;
+
+        case "director":
+          navigate("/dashboard/director");
+          break;
+
+        default:
+          navigate("/");
+      }
     } catch (error) {
-      console.log("LOGIN ERROR:", error);
+      console.log(error);
       message.error("Ошибка входа");
     }
   };

@@ -52,3 +52,9 @@ export interface Attendance {
   date: string;
   status: "present" | "absent" | "late";
 }
+export interface TeacherStudent {
+  id: number;
+  username: string;
+  grade?: number;
+  attendance?: "present" | "late" | "absent";
+}

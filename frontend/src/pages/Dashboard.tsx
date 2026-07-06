@@ -34,6 +34,7 @@ function Dashboard() {
           mode="inline"
           onClick={({ key }) => navigate(key)}
           items={[
+            { key: "/dashboard/stats", icon: <UserOutlined />, label: "Dashboard" },
             { key: "/dashboard/students", icon: <UserOutlined />, label: "Students" },
             { key: "/dashboard/teachers", icon: <TeamOutlined />, label: "Teachers" },
             { key: "/dashboard/classes", icon: <BookOutlined />, label: "Classes" },
