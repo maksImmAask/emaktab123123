@@ -8,33 +8,46 @@ import {
   Popconfirm,
   message,
 } from "antd";
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 
 import api from "../api/axios";
 import type { Teacher } from "../types";
 import { unwrapList } from "../utils/unwrapList";
 
 function Teachers() {
-  const [data, setData] = useState<Teacher[]>([]);
-  const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<Teacher | null>(null);
+  const [data, setData] =
+    useState<Teacher[]>([]);
+
+  const [open, setOpen] =
+    useState(false);
+
+  const [editing, setEditing] =
+    useState<Teacher | null>(null);
 
   const [form] = Form.useForm();
 
-  const role = localStorage.getItem("role");
-  const isAdmin = role === "admin";
-
   const loadData = useCallback(async () => {
     try {
-      const res = await api.get("/api/teachers/");
-      setData(unwrapList<Teacher>(res.data));
+      const res = await api.get(
+        "/api/teachers/"
+      );
+
+      setData(
+        unwrapList<Teacher>(res.data)
+      );
     } catch {
-      message.error("Ошибка загрузки");
+      message.error(
+        "Ошибка загрузки"
+      );
     }
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    //eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
   }, [loadData]);
 
@@ -44,7 +57,9 @@ function Teachers() {
     setOpen(true);
   };
 
-  const openEdit = (record: Teacher) => {
+  const openEdit = (
+    record: Teacher
+  ) => {
     setEditing(record);
 
     form.setFieldsValue({
@@ -56,47 +71,70 @@ function Teachers() {
 
   const handleSubmit = async () => {
     try {
-      const values = await form.validateFields();
+      const values =
+        await form.validateFields();
 
       if (editing) {
         await api.patch(
           `/api/teachers/${editing.id}/`,
           values
         );
-        message.success("Обновлено");
+
+        message.success(
+          "Обновлено"
+        );
       } else {
-        await api.post("/api/teachers/", values);
-        message.success("Создано");
+        await api.post(
+          "/api/teachers/",
+          values
+        );
+
+        message.success(
+          "Создано"
+        );
       }
 
       setOpen(false);
+
       loadData();
     } catch {
-      message.error("Ошибка сохранения");
+      message.error(
+        "Ошибка сохранения"
+      );
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (
+    id: number
+  ) => {
     try {
-      await api.delete(`/api/teachers/${id}/`);
-      message.success("Удалено");
+      await api.delete(
+        `/api/teachers/${id}/`
+      );
+
+      message.success(
+        "Удалено"
+      );
+
       loadData();
     } catch {
-      message.error("Ошибка удаления");
+      message.error(
+        "Ошибка удаления"
+      );
     }
   };
 
   return (
     <>
-      {isAdmin && (
-        <Button
-          type="primary"
-          onClick={openCreate}
-          style={{ marginBottom: 16 }}
-        >
-          Добавить учителя
-        </Button>
-      )}
+      <Button
+        type="primary"
+        onClick={openCreate}
+        style={{
+          marginBottom: 16,
+        }}
+      >
+        Добавить учителя
+      </Button>
 
       <Table<Teacher>
         rowKey="id"
@@ -112,25 +150,35 @@ function Teachers() {
           },
           {
             title: "Actions",
-            render: (_, record) =>
-              isAdmin ? (
-                <Space>
-                  <Button onClick={() => openEdit(record)}>
-                    Edit
-                  </Button>
+            render: (
+              _,
+              record
+            ) => (
+              <Space>
+                <Button
+                  onClick={() =>
+                    openEdit(
+                      record
+                    )
+                  }
+                >
+                  Edit
+                </Button>
 
-                  <Popconfirm
-                    title="Удалить?"
-                    onConfirm={() =>
-                      handleDelete(record.id)
-                    }
-                  >
-                    <Button danger>
-                      Delete
-                    </Button>
-                  </Popconfirm>
-                </Space>
-              ) : null,
+                <Popconfirm
+                  title="Удалить?"
+                  onConfirm={() =>
+                    handleDelete(
+                      record.id
+                    )
+                  }
+                >
+                  <Button danger>
+                    Delete
+                  </Button>
+                </Popconfirm>
+              </Space>
+            ),
           },
         ]}
       />
@@ -138,16 +186,27 @@ function Teachers() {
       <Modal
         open={open}
         title={
-          editing ? "Edit teacher" : "Add teacher"
+          editing
+            ? "Edit teacher"
+            : "Add teacher"
         }
         onOk={handleSubmit}
-        onCancel={() => setOpen(false)}
+        onCancel={() =>
+          setOpen(false)
+        }
       >
-        <Form form={form} layout="vertical">
+        <Form
+          form={form}
+          layout="vertical"
+        >
           <Form.Item
             name="username"
             label="Username"
-            rules={[{ required: true }]}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
           >
             <Input />
           </Form.Item>

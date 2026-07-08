@@ -18,12 +18,10 @@ import { unwrapList } from "../utils/unwrapList";
 function Classes() {
   const [data, setData] = useState<SchoolClass[]>([]);
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<SchoolClass | null>(null);
+  const [editing, setEditing] =
+    useState<SchoolClass | null>(null);
 
   const [form] = Form.useForm();
-
-  const role = localStorage.getItem("role");
-  const isAdmin = role === "admin";
 
   const loadData = useCallback(async () => {
     try {
@@ -114,17 +112,15 @@ function Classes() {
 
   return (
     <>
-      {isAdmin && (
-        <Button
-          type="primary"
-          onClick={openCreate}
-          style={{
-            marginBottom: 16,
-          }}
-        >
-          Добавить класс
-        </Button>
-      )}
+      <Button
+        type="primary"
+        onClick={openCreate}
+        style={{
+          marginBottom: 16,
+        }}
+      >
+        Добавить класс
+      </Button>
 
       <Table<SchoolClass>
         dataSource={data}
@@ -140,31 +136,30 @@ function Classes() {
           },
           {
             title: "Действия",
-            render: (_, record) =>
-              isAdmin ? (
-                <Space>
-                  <Button
-                    onClick={() =>
-                      openEdit(record)
-                    }
-                  >
-                    Edit
-                  </Button>
+            render: (_, record) => (
+              <Space>
+                <Button
+                  onClick={() =>
+                    openEdit(record)
+                  }
+                >
+                  Edit
+                </Button>
 
-                  <Popconfirm
-                    title="Удалить класс?"
-                    onConfirm={() =>
-                      handleDelete(
-                        record.id
-                      )
-                    }
-                  >
-                    <Button danger>
-                      Delete
-                    </Button>
-                  </Popconfirm>
-                </Space>
-              ) : null,
+                <Popconfirm
+                  title="Удалить класс?"
+                  onConfirm={() =>
+                    handleDelete(
+                      record.id
+                    )
+                  }
+                >
+                  <Button danger>
+                    Delete
+                  </Button>
+                </Popconfirm>
+              </Space>
+            ),
           },
         ]}
       />
@@ -196,9 +191,7 @@ function Classes() {
               },
             ]}
           >
-            <Input
-              placeholder="11A"
-            />
+            <Input placeholder="11A" />
           </Form.Item>
         </Form>
       </Modal>

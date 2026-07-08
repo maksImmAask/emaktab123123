@@ -341,11 +341,18 @@ function DashboardStats() {
                 columns={[
                 {
                     title: "Student",
-                    render: (_, row) => row.student.username,
+                    render: (_: unknown, row: Grade) =>
+                    row.student.username,
                 },
                 {
                     title: "Subject",
-                    render: (_, row) => row.subject.name,
+                    render: (_: unknown, row: Grade) =>
+                    row.schedule.subject.name,
+                },
+                {
+                    title: "Class",
+                    render: (_: unknown, row: Grade) =>
+                    row.schedule.school_class.name,
                 },
                 {
                     title: "Grade",

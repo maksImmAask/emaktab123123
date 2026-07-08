@@ -12,16 +12,14 @@ export interface Teacher {
   id: number;
   username: string;
 }
-
 export interface Grade {
   id: number;
+  student: Student;
+  teacher: Teacher;
+  schedule: Schedule;
   value: number;
   date: string;
-  student: Student;
-  subject: Subject;
-  teacher: Teacher;
 }
-
 export interface Schedule {
   id: number;
   weekday: number;

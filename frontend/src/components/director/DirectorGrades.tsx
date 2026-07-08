@@ -8,8 +8,14 @@ interface Grade {
     username: string;
   };
 
-  subject: {
-    name: string;
+  schedule: {
+    school_class: {
+      name: string;
+    };
+
+    subject: {
+      name: string;
+    };
   };
 
   teacher: {
@@ -51,9 +57,14 @@ function DirectorGrades({
               record.student.username,
           },
           {
+            title: "Класс",
+            render: (_, record) =>
+              record.schedule.school_class.name,
+          },
+          {
             title: "Предмет",
             render: (_, record) =>
-              record.subject.name,
+              record.schedule.subject.name,
           },
           {
             title: "Учитель",

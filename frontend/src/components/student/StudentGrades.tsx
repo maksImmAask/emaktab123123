@@ -29,10 +29,15 @@ function StudentGrades({ grades }: Props) {
         dataSource={grades}
         columns={[
           {
-            title: "Предмет",
-            render: (_: unknown, record: Grade) =>
-              record.subject.name,
-          },
+        title: "Класс",
+        render: (_: unknown, record: Grade) =>
+            record.schedule.school_class.name,
+        },
+        {
+        title: "Предмет",
+        render: (_: unknown, record: Grade) =>
+            record.schedule.subject.name,
+        },
           {
             title: "Оценка",
             dataIndex: "value",

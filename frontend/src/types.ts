@@ -39,8 +39,8 @@ export interface Homework {
 export interface Grade {
   id: number;
   student: Student;
-  subject: Subject;
   teacher: Teacher;
+  schedule: Schedule;
   value: number;
   date: string;
 }

@@ -13,7 +13,11 @@ import { useEffect, useState, useCallback } from "react";
 import dayjs from "dayjs";
 
 import api from "../api/axios";
-import type { Attendance, Student, Schedule } from "../types";
+import type {
+  Attendance,
+  Student,
+  Schedule,
+} from "../types";
 import { unwrapList } from "../utils/unwrapList";
 
 function AttendancePage() {
@@ -22,38 +26,35 @@ function AttendancePage() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
 
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<Attendance | null>(null);
+  const [editing, setEditing] =
+    useState<Attendance | null>(null);
 
   const [form] = Form.useForm();
 
-  const role = localStorage.getItem("role");
-  const isAdmin = role === "admin";
-
-
-    const loadData = useCallback(async () => {
+  const loadData = useCallback(async () => {
     try {
-        const [
+      const [
         attendanceRes,
         studentsRes,
         schedulesRes,
-        ] = await Promise.all([
+      ] = await Promise.all([
         api.get("/api/attendance/"),
         api.get("/api/students/"),
         api.get("/api/schedules/"),
-        ]);
+      ]);
 
-        setData(unwrapList(attendanceRes.data));
-        setStudents(unwrapList(studentsRes.data));
-        setSchedules(unwrapList(schedulesRes.data));
+      setData(unwrapList(attendanceRes.data));
+      setStudents(unwrapList(studentsRes.data));
+      setSchedules(unwrapList(schedulesRes.data));
     } catch {
-        message.error("Ошибка загрузки данных");
+      message.error("Ошибка загрузки данных");
     }
-    }, []);
+  }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
-    }, [loadData]);
+  }, [loadData]);
 
   const openCreate = () => {
     setEditing(null);
@@ -76,12 +77,15 @@ function AttendancePage() {
 
   const handleSubmit = async () => {
     try {
-      const values = await form.validateFields();
+      const values =
+        await form.validateFields();
 
       const payload = {
         student_id: values.student_id,
         schedule_id: values.schedule_id,
-        date: values.date.format("YYYY-MM-DD"),
+        date: values.date.format(
+          "YYYY-MM-DD"
+        ),
         status: values.status,
       };
 
@@ -91,14 +95,18 @@ function AttendancePage() {
           payload
         );
 
-        message.success("Посещаемость обновлена");
+        message.success(
+          "Посещаемость обновлена"
+        );
       } else {
         await api.post(
           "/api/attendance/",
           payload
         );
 
-        message.success("Посещаемость создана");
+        message.success(
+          "Посещаемость создана"
+        );
       }
 
       setOpen(false);
@@ -108,9 +116,13 @@ function AttendancePage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (
+    id: number
+  ) => {
     try {
-      await api.delete(`/api/attendance/${id}/`);
+      await api.delete(
+        `/api/attendance/${id}/`
+      );
 
       message.success("Удалено");
 
@@ -122,15 +134,13 @@ function AttendancePage() {
 
   return (
     <>
-      {isAdmin && (
-        <Button
-          type="primary"
-          onClick={openCreate}
-          style={{ marginBottom: 16 }}
-        >
-          Добавить посещаемость
-        </Button>
-      )}
+      <Button
+        type="primary"
+        onClick={openCreate}
+        style={{ marginBottom: 16 }}
+      >
+        Добавить посещаемость
+      </Button>
 
       <Table<Attendance>
         dataSource={data}
@@ -138,12 +148,14 @@ function AttendancePage() {
         columns={[
           {
             title: "Student",
-            render: (_, r) => r.student.username,
+            render: (_, r) =>
+              r.student.username,
           },
           {
             title: "Class",
             render: (_, r) =>
-              r.student.school_class.name,
+              r.student.school_class
+                ?.name ?? "—",
           },
           {
             title: "Date",
@@ -155,29 +167,30 @@ function AttendancePage() {
           },
           {
             title: "Actions",
-            render: (_, record) =>
-              isAdmin ? (
-                <Space>
-                  <Button
-                    onClick={() =>
-                      openEdit(record)
-                    }
-                  >
-                    Edit
-                  </Button>
+            render: (_, record) => (
+              <Space>
+                <Button
+                  onClick={() =>
+                    openEdit(record)
+                  }
+                >
+                  Edit
+                </Button>
 
-                  <Popconfirm
-                    title="Удалить запись?"
-                    onConfirm={() =>
-                      handleDelete(record.id)
-                    }
-                  >
-                    <Button danger>
-                      Delete
-                    </Button>
-                  </Popconfirm>
-                </Space>
-              ) : null,
+                <Popconfirm
+                  title="Удалить запись?"
+                  onConfirm={() =>
+                    handleDelete(
+                      record.id
+                    )
+                  }
+                >
+                  <Button danger>
+                    Delete
+                  </Button>
+                </Popconfirm>
+              </Space>
+            ),
           },
         ]}
       />
@@ -190,7 +203,9 @@ function AttendancePage() {
             : "Добавить посещаемость"
         }
         onOk={handleSubmit}
-        onCancel={() => setOpen(false)}
+        onCancel={() =>
+          setOpen(false)
+        }
       >
         <Form
           form={form}
@@ -206,10 +221,12 @@ function AttendancePage() {
             ]}
           >
             <Select
-              options={students.map((s) => ({
-                value: s.id,
-                label: s.username,
-              }))}
+              options={students.map(
+                (s) => ({
+                  value: s.id,
+                  label: s.username,
+                })
+              )}
             />
           </Form.Item>
 
@@ -223,10 +240,12 @@ function AttendancePage() {
             ]}
           >
             <Select
-              options={schedules.map((s) => ({
-                value: s.id,
-                label: `Lesson ${s.lesson_number}`,
-              }))}
+              options={schedules.map(
+                (s) => ({
+                  value: s.id,
+                  label: `Lesson ${s.lesson_number}`,
+                })
+              )}
             />
           </Form.Item>
 
@@ -240,7 +259,9 @@ function AttendancePage() {
             ]}
           >
             <DatePicker
-              style={{ width: "100%" }}
+              style={{
+                width: "100%",
+              }}
             />
           </Form.Item>
 
@@ -257,11 +278,13 @@ function AttendancePage() {
               options={[
                 {
                   value: "present",
-                  label: "Present",
+                  label:
+                    "Present",
                 },
                 {
                   value: "absent",
-                  label: "Absent",
+                  label:
+                    "Absent",
                 },
                 {
                   value: "late",

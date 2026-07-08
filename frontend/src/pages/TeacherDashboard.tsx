@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useCallback } from "react";
 import {
   Grid,
   Stack,
@@ -86,6 +85,19 @@ function TeacherDashboard() {
         value: number;
       }[]
     >([]);
+    const loadStudents = useCallback(async () => {
+    if (!selectedClass || !selectedSubject) return;
+
+    try {
+        const res = await api.get<TeacherStudent[]>(
+        `/api/teacher/students/?class=${selectedClass}&subject=${selectedSubject}`
+        );
+
+        setStudents(res.data);
+    } catch (e) {
+        console.error(e);
+    }
+    }, [selectedClass, selectedSubject]);
 
   useEffect(() => {
     api
@@ -117,24 +129,11 @@ function TeacherDashboard() {
       });
   }, []);
 
-  useEffect(() => {
-    if (
-      !selectedClass ||
-      !selectedSubject
-    )
-      return;
-
-    api
-      .get<TeacherStudent[]>(
-        `/api/teacher/students/?class=${selectedClass}&subject=${selectedSubject}`
-      )
-      .then((res) => {
-        setStudents(res.data);
-      });
-  }, [
-    selectedClass,
-    selectedSubject,
-  ]);
+    useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadStudents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedClass, selectedSubject]);
 
   const handleGradeChange = (
     id: number,
@@ -168,39 +167,36 @@ function TeacherDashboard() {
     );
     };
 
-  const handleSave = async () => {
-    if (
-      !selectedClass ||
-      !selectedSubject
-    )
-      return;
+    const handleSave = async () => {
+    if (!selectedClass || !selectedSubject)
+        return;
 
     setLoading(true);
 
     try {
-      await api.post(
+        await api.post(
         "/api/teacher/save-journal/",
         {
-          class_id: selectedClass,
-          subject_id: selectedSubject,
+            class_id: selectedClass,
+            subject_id: selectedSubject,
 
-          students: students.map(
-            (student) => ({
-              student: student.id,
-              grade:
-                student.grade ?? 5,
-              attendance:
-                student.attendance ??
-                "present",
-            })
-          ),
+            students: students.map((student) => ({
+            student: student.id,
+            grade: student.grade ?? 5,
+            attendance:
+                student.attendance ?? "present",
+            })),
         }
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+        );
 
+        await loadStudents();
+
+    } catch (e) {
+        console.error(e);
+    } finally {
+        setLoading(false);
+    }
+    };
   return (
     <Stack p="lg">
       <Title order={2}>
@@ -232,9 +228,19 @@ function TeacherDashboard() {
             lg: 6,
           }}
         >
-          <TeacherHomework
+            <TeacherHomework
             homework={homework}
-          />
+            schedule={schedule}
+            onReload={() => {
+                api
+                .get<TeacherDashboardResponse>(
+                    "/api/teacher/dashboard/"
+                )
+                .then((res) => {
+                    setHomework(res.data.homework);
+                });
+            }}
+            />
         </Grid.Col>
       </Grid>
 
