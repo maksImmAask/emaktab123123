@@ -49,6 +49,9 @@ function TeacherDashboard() {
 
   const [selectedClass, setSelectedClass] =
     useState<number | null>(null);
+    
+  const [selectedSchedule, setSelectedSchedule] =
+    useState<number | null>(null);
 
   const [selectedSubject, setSelectedSubject] =
     useState<number | null>(null);
@@ -86,18 +89,20 @@ function TeacherDashboard() {
       }[]
     >([]);
     const loadStudents = useCallback(async () => {
-    if (!selectedClass || !selectedSubject) return;
+    if (!selectedSchedule) return;
+
+
 
     try {
         const res = await api.get<TeacherStudent[]>(
-        `/api/teacher/students/?class=${selectedClass}&subject=${selectedSubject}`
+        `/api/teacher/students/?schedule=${selectedSchedule}`
         );
 
         setStudents(res.data);
     } catch (e) {
         console.error(e);
     }
-    }, [selectedClass, selectedSubject]);
+    }, [selectedSchedule]);
 
   useEffect(() => {
     api
@@ -128,12 +133,26 @@ function TeacherDashboard() {
         );
       });
   }, []);
+  useEffect(() => {
+    if (!selectedClass || !selectedSubject) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setSelectedSchedule(null);
+        return;
+    }
 
+    const lesson = schedule.find(
+        (item) =>
+        item.school_class.id === selectedClass &&
+        item.subject.id === selectedSubject
+    );
+
+    setSelectedSchedule(lesson?.id ?? null);
+    }, [selectedClass, selectedSubject, schedule]);
     useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadStudents();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedClass, selectedSubject]);
+    }, [selectedSchedule]);
 
   const handleGradeChange = (
     id: number,
@@ -168,7 +187,7 @@ function TeacherDashboard() {
     };
 
     const handleSave = async () => {
-    if (!selectedClass || !selectedSubject)
+    if (!selectedSchedule)
         return;
 
     setLoading(true);
@@ -177,8 +196,7 @@ function TeacherDashboard() {
         await api.post(
         "/api/teacher/save-journal/",
         {
-            class_id: selectedClass,
-            subject_id: selectedSubject,
+            schedule_id: selectedSchedule,
 
             students: students.map((student) => ({
             student: student.id,

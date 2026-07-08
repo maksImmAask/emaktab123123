@@ -1,15 +1,23 @@
 import { Button, Card, Form, Input, message } from "antd";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../store/authStore";
+import { useAuthStore, type UserRole } from "../store/authStore";
 
 interface LoginForm {
   username: string;
   password: string;
 }
 
+const roleRoutes: Record<UserRole, string> = {
+  admin: "/dashboard",
+  teacher: "/teacher",
+  student: "/student",
+  director: "/director",
+};
+
 function Login() {
   const [form] = Form.useForm();
+
   const navigate = useNavigate();
 
   const login = useAuthStore((state) => state.login);
@@ -29,28 +37,13 @@ function Login() {
 
       message.success("Вход выполнен");
 
-      switch (data.user.role) {
-        case "admin":
-          navigate("/dashboard/admin");
-          break;
+      const role = data.user.role as UserRole;
 
-        case "teacher":
-          navigate("/dashboard/teacher");
-          break;
-
-        case "student":
-          navigate("/dashboard/student");
-          break;
-
-        case "director":
-          navigate("/dashboard/director");
-          break;
-
-        default:
-          navigate("/");
-      }
+      navigate(roleRoutes[role], {
+        replace: true,
+      });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       message.error("Ошибка входа");
     }
   };
@@ -64,7 +57,10 @@ function Login() {
         alignItems: "center",
       }}
     >
-      <Card title="Вход" style={{ width: 400 }}>
+      <Card
+        title="Вход"
+        style={{ width: 400 }}
+      >
         <Form
           form={form}
           layout="vertical"
